@@ -1,5 +1,6 @@
 package org.amlou;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,5 +25,14 @@ public class MetierProduitImpl implements IMetier<Produit> {
     @Override
     public void delete(long id) {
         produits.removeIf(p -> p.getId() == id);
+    }
+
+    @Override
+    public void saveAll() throws IOException {
+        File file = new File("produits.dat");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.reset();
+        objectOutputStream.writeObject(produits);
     }
 }

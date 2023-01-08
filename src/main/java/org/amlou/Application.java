@@ -1,5 +1,6 @@
 package org.amlou;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,16 +8,30 @@ import java.util.Scanner;
 
 public class Application {
     public static void main(String[] args) {
+        final IMetier<Produit> metier = new MetierProduitImpl();
+        File file = new File("produits.dat");
+
+        try {
+            if (file.exists()) {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                List<Produit> initProduits = ((List<Produit>) objectInputStream.readObject());
+                initProduits.forEach(metier::add);
+            }
+        } catch (Exception e) {
+            System.out.printf("Une erreur s'est produite veuillez réessayer.\n%s\n", e);
+            System.exit(0);
+        }
         while (true) {
             System.out.printf("\n---------------------------------------------\n" +
                     "1. Afficher la liste des produits.\n" +
                     "2. Rechercher un produit par son id.\n" +
                     "3. Ajouter un nouveau produit dans la liste.\n" +
                     "4. Supprimer un produit par id.\n" +
-                    "5. Quitter ce programme.\n" +
+                    "5. Sauvegarder les produits\n" +
+                    "6. Quitter ce programme.\n" +
                     "---------------------------------------------\n\n");
             try {
-                final IMetier<Produit> metier = new MetierProduitImpl();
                 Scanner input = new Scanner(System.in);
                 int selectedIndex;
 
@@ -64,6 +79,10 @@ public class Application {
                             System.out.println("Aucun produit n'existe avec l'identifiant donné.");
                         break;
                     case 5:
+                        metier.saveAll();
+                        System.out.println("Produits enregistrés avec succès.");
+                        break;
+                    case 6:
                         System.out.println("Quitter le programme");
                         System.exit(0);
                         break;
@@ -75,4 +94,6 @@ public class Application {
             }
         }
     }
+
+
 }
